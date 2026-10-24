@@ -171,6 +171,33 @@ button { cursor: pointer; }
 .ritem .rq { font-size: .9rem; }
 .ritem .ra { font-size: .85rem; color: var(--muted); }
 
+/* titles */
+.title-now, .promo-to, .title-strip, .titles li { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.title-now { font-family: var(--font-display); font-weight: 900; font-size: 1.15rem; margin-top: 2px; }
+.lv { font-family: var(--font-display); font-size: .72rem; font-weight: 900; letter-spacing: .04em; color: var(--accent); background: var(--accent-weak); border-radius: 6px; padding: 1px 7px; }
+.tname { font-family: var(--font-display); font-weight: 900; }
+.tname rt { font-family: var(--font-body); font-weight: 500; font-size: .5em; color: var(--muted); }
+.gem { width: 14px; height: 14px; flex: none; transform: rotate(45deg); border-radius: 3px; background: linear-gradient(135deg, rgba(255,255,255,.75), transparent 55%), var(--gem); box-shadow: 0 0 0 1px var(--line), 0 0 8px color-mix(in srgb, var(--gem) 55%, transparent); }
+.wand { color: var(--accent); font-size: .95rem; line-height: 1; }
+.need { font-family: var(--font-display); font-size: 1.1rem; color: var(--accent); margin: 0 2px; }
+.titles { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; }
+.titles summary { cursor: pointer; font-weight: 700; color: var(--accent); }
+.titles ol { list-style: none; margin: 10px 0; padding: 0; display: flex; flex-direction: column; }
+.titles li { padding: 7px 0; border-top: 1px solid var(--line); color: var(--muted); }
+.titles li .tname { color: var(--muted); font-weight: 700; }
+.titles li.got .tname { color: var(--ink); }
+.titles li.now { background: var(--accent-weak); margin: 0 -8px; padding-inline: 8px; border-radius: 8px; }
+.titles li:not(.got) .gem, .titles li:not(.got) .wand { opacity: .35; }
+.tmin { margin-left: auto; font-size: .8rem; }
+.title-strip { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; }
+.title-strip .muted { margin-left: auto; }
+.promote { background: var(--surface); border: 2px solid var(--accent); border-radius: 16px; padding: 18px 16px; display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; animation: pop .5s ease-out; }
+.promote .promo-to { justify-content: center; font-size: 1.5rem; }
+.promote .gem { width: 20px; height: 20px; }
+.promo-head { font-family: var(--font-display); font-weight: 900; font-size: 1.7rem; color: var(--accent); letter-spacing: .1em; }
+.promo-from { color: var(--muted); font-size: .9rem; text-decoration: line-through; }
+@keyframes pop { from { transform: scale(.94); } to { transform: scale(1); } }
+
 .help { font-size: .82rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
 .help b { color: var(--ink); }
 .reset { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -221,6 +248,29 @@ function norm(s) {
     .replace(/[−–]/g, '-')
     .replace(/^約/, '');
 }
+const TITLES = [
+  ['見習い魔法使い', 0], ['初級魔法使い', 5], ['中級魔法使い', 10], ['上級魔法使い', 15],
+  ['魔導士', 20], ['大魔導士', 25], ['賢者', 30], ['大賢者', 35],
+  ['水晶賢者', 40, '#dbe4ee', 'すいしょう'], ['柘榴石賢者', 45, '#8e1b2b', 'ざくろいし'], ['紫水晶賢者', 50, '#8a5cc2', 'むらさきすいしょう'],
+  ['橄欖石賢者', 55, '#8fbf3a', 'かんらんせき'], ['藍玉賢者', 60, '#6fc3d9', 'らんぎょく'], ['黄玉賢者', 65, '#e8a93a', 'おうぎょく'],
+  ['猫目石賢者', 70, '#c7a64a', 'ねこめいし'], ['翡翠賢者', 75, '#3f9a6b', 'ひすい'], ['青玉賢者', 80, '#2350b8', 'せいぎょく'],
+  ['翠玉賢者', 85, '#1c8a5a', 'すいぎょく'], ['紅玉賢者', 90, '#c4123a', 'こうぎょく'], ['金剛石賢者', 100, '#ffffff', 'こんごうせき']
+].map((t, i) => ({ lv: i + 1, name: t[0], min: t[1], gem: t[2] || '', read: t[3] || '' }));
+function titleOf(m, total) {
+  const pct = m / total * 100; let cur = TITLES[0];
+  TITLES.forEach(t => { if (pct >= t.min) cur = t; });
+  const nx = TITLES[cur.lv] || null;
+  const need = nx ? Math.max(1, Math.ceil(nx.min / 100 * total - 1e-9) - m) : 0;
+  return { cur, nx, need };
+}
+function subjectStats(subject) {
+  let m = 0, t = 0, w = 0;
+  DATA.filter(u => u.subject === subject).forEach(u => { const s = unitStats(u); m += s.m; t += s.total; w += s.wrong; });
+  return { m, t, w, pct: Math.round(m / t * 100), title: titleOf(m, t) };
+}
+const gemDot = t => t.gem ? `<span class="gem" style="--gem:${t.gem}" aria-hidden="true"></span>` : `<span class="wand" aria-hidden="true">✦</span>`;
+const titleName = t => t.read ? `<ruby>${esc(t.name.replace('賢者', ''))}<rt>${t.read}</rt></ruby>賢者` : esc(t.name);
+
 let actx = null;
 function audio() {
   try {
@@ -258,6 +308,13 @@ function playNg() { // ポヨン：下がりながら揺れる音
   o.connect(g); g.connect(c.destination);
   o.start(t); l.start(t); o.stop(t + 0.65); l.stop(t + 0.65);
 }
+function playFanfare() { // 昇格のファンファーレ
+  const c = audio(); if (!c) return; const t = c.currentTime + 0.02;
+  [[523.25, 0], [659.25, .12], [783.99, .24]].forEach(([f, d]) => { tone(c, f, t + d, .2, .22, 'triangle'); });
+  tone(c, 783.99, t + .4, .14, .2, 'triangle'); tone(c, 1046.5, t + .54, 1.1, .26, 'triangle');
+  [659.25, 783.99, 523.25].forEach(f => tone(c, f, t + .54, 1.1, .1, 'sine'));
+  tone(c, 2093, t + .54, .6, .04, 'sine');
+}
 function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
 let view = 'home', unit = null, quiz = null, confirmReset = false;
@@ -274,9 +331,8 @@ function ring(pct) {
 
 function renderHome() {
   const units = DATA.filter(u => u.subject === pref.subject);
-  let m = 0, t = 0, w = 0;
-  units.forEach(u => { const s = unitStats(u); m += s.m; t += s.total; w += s.wrong; });
-  const pct = Math.round(m / t * 100);
+  const ss = subjectStats(pref.subject);
+  const m = ss.m, t = ss.t, w = ss.w, pct = ss.pct, ti = ss.title;
   app.innerHTML = `
     <header class="top">
       <span class="eyebrow">定期試験対策</span>
@@ -289,9 +345,16 @@ function renderHome() {
       ${ring(pct)}
       <div class="overall-text">
         <h2>${esc(pref.subject)}の記憶度</h2>
+        <p class="title-now"><span class="lv num">Lv.${ti.cur.lv}</span>${gemDot(ti.cur)}<span class="tname">${titleName(ti.cur)}</span></p>
+        <p class="muted num">${ti.nx ? `次の「${esc(ti.nx.name)}」まで あと<b class="need">${ti.need}</b>問` : '最高位に到達しました'}</p>
         <p class="muted num">覚えた問題 ${m} / ${t}問　${w ? `<span class="mark">過去に間違えた問題 ${w}問</span>` : ''}</p>
       </div>
     </section>
+    <details class="titles">
+      <summary>称号一覧（全20段階）</summary>
+      <ol>${TITLES.map(x => `<li class="${x.lv <= ti.cur.lv ? 'got' : ''}${x.lv === ti.cur.lv ? ' now' : ''}"><span class="lv num">Lv.${x.lv}</span>${gemDot(x)}<span class="tname">${titleName(x)}</span><span class="tmin num">${x.min}%〜</span></li>`).join('')}</ol>
+      <p class="muted">2回続けて正解した問題の割合（記憶度）で称号が上がります。称号は科目ごとです。</p>
+    </details>
     <section class="units" aria-label="単元">
       ${units.map(u => { const s = unitStats(u); return `
         <button class="unit" data-unit="${u.id}">
@@ -381,7 +444,9 @@ function startQuiz(qs) {
   let list = shuffle(qs);
   if (pref.count) list = list.slice(0, pref.count);
   const memBefore = unitStats(unit).pct;
+  const lvBefore = subjectStats(unit.subject).title.cur.lv;
   quiz = {
+    lvBefore,
     items: list.map(q => ({ q, kind: (pref.mode === 'input' && !q.co) ? 'input' : 'choice', opts: shuffle([q.a].concat(q.d)), was: { ...R(qid(unit, q)) }, done: false, ok: null, given: '' })),
     i: 0, memBefore
   };
@@ -462,11 +527,20 @@ function renderResult() {
   const its = quiz.items, okN = its.filter(i => i.ok).length;
   const s = unitStats(unit);
   const wrongs = its.filter(i => !i.ok).map(i => i.q);
+  const sj = subjectStats(unit.subject), ti = sj.title;
+  const up = ti.cur.lv > quiz.lvBefore && !quiz.celebrated;
+  const prev = TITLES[quiz.lvBefore - 1];
   app.innerHTML = `
     <header class="top">
       <span class="eyebrow">${esc(unit.subject)}　${esc(unit.label)}　${esc(unit.title)}</span>
       <h1>結果</h1>
     </header>
+    ${ti.cur.lv > quiz.lvBefore ? `<section class="promote" role="status">
+      <span class="promo-head">昇格！</span>
+      <p class="promo-from">${esc(prev.name)}</p>
+      <p class="promo-to"><span class="lv num">Lv.${ti.cur.lv}</span>${gemDot(ti.cur)}<span class="tname">${titleName(ti.cur)}</span></p>
+      <p class="muted num">${ti.nx ? `次の「${esc(ti.nx.name)}」まで あと${ti.need}問` : '最高位に到達しました'}</p>
+    </section>` : `<section class="title-strip"><span class="lv num">Lv.${ti.cur.lv}</span>${gemDot(ti.cur)}<span class="tname">${titleName(ti.cur)}</span><span class="muted num">${ti.nx ? `次の称号まで あと${ti.need}問` : '最高位'}</span></section>`}
     <section class="panel">
       <div class="score num"><b>${okN}</b><span>/ ${its.length}問 正解</span></div>
       <div class="memline num"><span class="muted">この単元の記憶度</span><span>${quiz.memBefore}%</span><span class="muted">→</span><b>${s.pct}%</b></div>
@@ -483,6 +557,7 @@ function renderResult() {
           <div><p class="rq"><span class="num">No.${i.q.n}</span>　${esc(i.q.q)}</p><p class="ra">正答：${esc(i.q.a)}${!i.ok && i.kind === 'input' ? `　／　あなたの答え：${esc(i.given || '（無回答）')}` : ''}</p></div>
         </div>`).join('')}</div>
     </section>`;
+  if (up) { quiz.celebrated = true; if (pref.sound) { try { playFanfare(); } catch (e) {} } }
   const rw = document.getElementById('retryWrong');
   if (rw) rw.onclick = () => { const c = pref.count; pref.count = 0; startQuiz(wrongs); pref.count = c; };
   document.getElementById('again').onclick = () => { const p = pool(unit, pref.filter); startQuiz(p.length ? p : unit.qs); };
