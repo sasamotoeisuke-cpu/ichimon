@@ -156,6 +156,35 @@ button { cursor: pointer; }
 .feedback.ng .verdict { color: var(--ng); }
 .feedback .ans { font-weight: 700; }
 
+.fb-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.fb-sub { font-size: .8rem; color: var(--muted); }
+
+/* quiz screen: compact so question, choices, judgment and next fit on one phone screen */
+body.quizmode { padding-block: 8px 96px; }
+.quizmode .wrap { gap: 8px; }
+.quizmode .back { padding: 2px 0; font-size: .9rem; }
+.quizmode .qcard { padding: 12px 14px; gap: 8px; border-radius: 14px; }
+.quizmode .badges { gap: 6px; }
+.quizmode .badge { font-size: .72rem; padding: 1px 8px; }
+.quizmode .hist { font-size: .72rem; }
+.quizmode .qtext { font-size: 1rem; line-height: 1.55; }
+.quizmode .choices { gap: 6px; }
+.quizmode .choice { min-height: 42px; padding: 7px 12px; gap: 8px; grid-template-columns: 1.7em 1fr; border-radius: 10px; line-height: 1.45; font-size: .95rem; }
+.quizmode .choice .k { width: 1.7em; height: 1.7em; font-size: .78rem; }
+.quizmode .answer-form { gap: 8px; }
+.quizmode .answer-input { padding: 10px 12px; font-size: 1.05rem; }
+.quizmode .row .btn { padding: 10px 14px; }
+.quizmode .feedback { padding: 8px 12px; gap: 2px; border-radius: 10px; }
+.quizmode .verdict { font-size: 1.05rem; }
+.quizmode .feedback .ans { font-size: .95rem; }
+.nextbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: var(--bg); border-top: 1px solid var(--line);
+  display: flex; justify-content: center;
+}
+.nextbar .btn { width: 100%; max-width: 640px; padding: 12px 18px; }
+
 /* result */
 .score { display: flex; align-items: baseline; gap: 8px; font-family: var(--font-display); }
 .score b { font-size: 3rem; font-weight: 900; line-height: 1; }
@@ -476,13 +505,13 @@ function renderQuiz() {
   }
   let fb = '';
   if (it.done) {
+    const showAns = it.kind === 'input' || !it.ok;
     fb = `<div class="feedback ${it.ok ? 'ok' : 'ng'}" role="status">
-      <span class="verdict">${it.ok ? '○ 正解' : '× 不正解'}</span>
-      ${it.kind === 'input' && !it.ok ? `<span class="muted">あなたの答え：${esc(it.given || '（無回答）')}</span>` : ''}
-      <span>正答：<span class="ans">${esc(q.a)}</span></span>
-      ${!it.ok ? '<span class="muted">「過去に間違えた問題」に入りました。</span>' : (mastered(qid(unit, q)) && was.m ? '<span class="muted">2回続けて正解したので、間違えた問題の印が外れました。</span>' : '')}
+      <p class="fb-line"><span class="verdict">${it.ok ? '○ 正解' : '× 不正解'}</span>${showAns ? `<span>正答：<span class="ans">${esc(q.a)}</span></span>` : ''}</p>
+      ${it.kind === 'input' && !it.ok ? `<span class="fb-sub">あなたの答え：${esc(it.given || '（無回答）')}</span>` : ''}
+      ${!it.ok ? '<span class="fb-sub">「過去に間違えた問題」に入りました</span>' : (mastered(qid(unit, q)) && was.m ? '<span class="fb-sub">2回続けて正解したので、印が外れました</span>' : '')}
     </div>
-    <button class="btn" id="next">${quiz.i + 1 < n ? '次の問題へ' : '結果を見る'}</button>`;
+    <div class="nextbar"><button class="btn" id="next">${quiz.i + 1 < n ? '次の問題へ' : '結果を見る'}</button></div>`;
   }
   app.innerHTML = `
     <div class="qhead"><button class="back" id="quit">← やめる</button><span class="qright"><button class="sound" id="sound" aria-pressed="${pref.sound}">${pref.sound ? '音 ON' : '音 OFF'}</button><span class="muted num">${quiz.i + 1} / ${n}</span></span></div>
@@ -561,6 +590,7 @@ function renderResult() {
 }
 
 function render() {
+  document.body.classList.toggle('quizmode', view === 'quiz');
   if (view === 'home') renderHome();
   else if (view === 'setup') renderSetup();
   else if (view === 'quiz') renderQuiz();
