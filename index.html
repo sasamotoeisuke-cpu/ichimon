@@ -346,7 +346,7 @@ function renderHome() {
       <div class="overall-text">
         <h2>${esc(pref.subject)}の記憶度</h2>
         <p class="title-now"><span class="lv num">Lv.${ti.cur.lv}</span>${gemDot(ti.cur)}<span class="tname">${titleName(ti.cur)}</span></p>
-        <p class="muted num">${ti.nx ? `次の「${esc(ti.nx.name)}」まで あと<b class="need">${ti.need}</b>問` : '最高位に到達しました'}</p>
+        <p class="muted num">${ti.nx ? `次の称号まで あと<b class="need">${ti.need}</b>問` : '最高位に到達しました'}</p>
         <p class="muted num">覚えた問題 ${m} / ${t}問　${w ? `<span class="mark">過去に間違えた問題 ${w}問</span>` : ''}</p>
       </div>
     </section>
@@ -535,7 +535,7 @@ function renderResult() {
       <span class="promo-head">昇格！</span>
       <p class="promo-from">${esc(prev.name)}</p>
       <p class="promo-to"><span class="lv num">Lv.${ti.cur.lv}</span>${gemDot(ti.cur)}<span class="tname">${titleName(ti.cur)}</span></p>
-      <p class="muted num">${ti.nx ? `次の「${esc(ti.nx.name)}」まで あと${ti.need}問` : '最高位に到達しました'}</p>
+      <p class="muted num">${ti.nx ? `次の称号まで あと${ti.need}問` : '最高位に到達しました'}</p>
     </section>` : `<section class="title-strip"><span class="lv num">Lv.${ti.cur.lv}</span>${gemDot(ti.cur)}<span class="tname">${titleName(ti.cur)}</span><span class="muted num">${ti.nx ? `次の称号まで あと${ti.need}問` : '最高位'}</span></section>`}
     <section class="panel">
       <div class="score num"><b>${okN}</b><span>/ ${its.length}問 正解</span></div>
