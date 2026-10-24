@@ -350,11 +350,6 @@ function renderHome() {
         <p class="muted num">覚えた問題 ${m} / ${t}問　${w ? `<span class="mark">過去に間違えた問題 ${w}問</span>` : ''}</p>
       </div>
     </section>
-    <details class="titles">
-      <summary>称号一覧（全20段階）</summary>
-      <ol>${TITLES.map(x => `<li class="${x.lv <= ti.cur.lv ? 'got' : ''}${x.lv === ti.cur.lv ? ' now' : ''}"><span class="lv num">Lv.${x.lv}</span>${gemDot(x)}<span class="tname">${titleName(x)}</span><span class="tmin num">${x.min}%〜</span></li>`).join('')}</ol>
-      <p class="muted">2回続けて正解した問題の割合（記憶度）で称号が上がります。称号は科目ごとです。</p>
-    </details>
     <section class="units" aria-label="単元">
       ${units.map(u => { const s = unitStats(u); return `
         <button class="unit" data-unit="${u.id}">
@@ -368,6 +363,7 @@ function renderHome() {
     </section>
     <section class="help">
       <p><b>記憶度とは</b>　2回続けて正解した問題を「覚えた」とし、単元の全問題のうち「覚えた」問題の割合を表しています。</p>
+      <p><b>称号</b>　2回続けて正解した問題の割合（記憶度）で称号が上がります。称号は科目ごとです。</p>
       <p><b>過去に間違えた問題</b>　間違えると黄色の印が付き、2回続けて正解すると印が外れます。</p>
       <p>学習の記録はこの端末のこのブラウザに保存されます。別の端末やブラウザでは引き継がれません。</p>
       <div class="reset">${confirmReset
