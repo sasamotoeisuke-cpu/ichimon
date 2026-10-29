@@ -231,6 +231,7 @@ body.quizmode { padding-block: 8px 96px; }
 .help { font-size: .82rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
 .help b { color: var(--ink); }
 .reset { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.credit { margin: 28px 0 8px; text-align: center; font-size: .78rem; color: var(--muted); letter-spacing: .04em; }
 .linkbtn { border: 0; background: transparent; color: var(--muted); text-decoration: underline; padding: 4px 0; font-size: .82rem; }
 .danger { border: 0; border-radius: 8px; background: var(--ng); color: var(--surface); padding: 6px 12px; font-size: .82rem; font-weight: 700; }
 .empty { padding: 14px 16px; background: var(--bg); border-radius: 10px; font-size: .9rem; color: var(--muted); }
@@ -400,6 +401,7 @@ function renderHome() {
       <div class="reset">${confirmReset
         ? `<span>すべての記録を消しますか？</span><button class="danger" id="doReset">消す</button><button class="linkbtn" id="cancelReset">やめる</button>`
         : `<button class="linkbtn" id="askReset">学習の記録をすべて消す</button>`}</div>
+      <p class="credit">© みらい塾ポケット狭山台</p>
     </section>`;
   app.querySelectorAll('[data-subject]').forEach(b => b.onclick = () => { pref.subject = b.dataset.subject; savePref(); renderHome(); });
   app.querySelectorAll('[data-unit]').forEach(b => b.onclick = () => { unit = DATA.find(u => u.id === b.dataset.unit); view = 'setup'; render(); });
