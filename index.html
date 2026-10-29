@@ -68,6 +68,9 @@ button { cursor: pointer; }
 
 /* header */
 .top { display: flex; flex-direction: column; gap: 6px; }
+.presents { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.presents-name { font-size: .95rem; font-weight: 800; color: var(--text, inherit); letter-spacing: .04em; }
+.presents-word { font-size: .8rem; font-style: italic; color: var(--muted); letter-spacing: .06em; }
 .eyebrow { font-size: .75rem; letter-spacing: .12em; color: var(--accent); font-weight: 700; }
 
 /* tabs */
@@ -365,6 +368,7 @@ function renderHome() {
   const m = ss.m, t = ss.t, w = ss.w, pct = ss.pct, ti = ss.title;
   app.innerHTML = `
     <header class="top">
+      <p class="presents"><span class="presents-name">みらい塾ポケット狭山台</span><span class="presents-word">presents</span></p>
       <span class="eyebrow">定期試験対策</span>
       <h1>日本史・政経 一問一答</h1>
     </header>
